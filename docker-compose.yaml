@@ -1,0 +1,94 @@
+services:
+  mongo:
+    image: mongo:latest
+    container_name: nodejs-rag-mongo
+    volumes:
+      - mongo-db-data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - nodejs-rag-network
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: nodejs-rag-mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017
+      ME_CONFIG_BASICAUTH: "false"
+    depends_on:
+      - mongo
+    networks:
+      - nodejs-rag-network
+    restart: unless-stopped
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    hostname: qdrant
+    container_name: nodejs-rag-qdrant
+    networks:
+      - nodejs-rag-network
+    ports:
+      - "6333:6333"
+    restart: unless-stopped
+    volumes:
+      - qdrant-data:/qdrant/storage
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: nodejs-rag-ollama
+    networks:
+      - nodejs-rag-network
+    restart: unless-stopped
+    volumes:
+      - ollama-data:/root/.ollama
+    env_file:
+      - .env
+    ports:
+      - "11434:11434"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nodejs-rag-backend
+    environment:
+      - FORCE_COLOR=1
+      - PORT=3000
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    depends_on:
+      mongo:
+        condition: service_started
+      qdrant:
+        condition: service_started
+      ollama:
+        condition: service_started
+    networks:
+      - nodejs-rag-network
+    restart: unless-stopped
+
+networks:
+  nodejs-rag-network:
+    name: nodejs-rag-network
+    driver: bridge
+
+volumes:
+  mongo-db-data:
+  qdrant-data:
+  ollama-data:
