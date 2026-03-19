@@ -103,11 +103,21 @@ You also need the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/
 
 ### 1. Configure environment
 
+Copy the example file and edit it as needed:
+
+**Linux / macOS:**
+
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` if needed (timezone, GPU settings, log level).
+**Windows:**
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Open `.env` and adjust values if needed (timezone, log level, model names).
 
 ### 2. Start infrastructure
 
