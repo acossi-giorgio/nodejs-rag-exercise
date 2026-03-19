@@ -33,7 +33,7 @@ Express API (port 3000)
         ├── rag-rephrasing   → rag + automatic query rewriting
         └── garden-assistant → real-time sensor data from MQTT/MongoDB
 
-MQTT Consumer (background job)
+MQTT Consumer
   └── subscribes to temperature / humidity topics
   └── stores readings in MongoDB
 ```
@@ -84,7 +84,32 @@ Sensor-aware pipeline for vegetable garden monitoring:
 - Docker & Docker Compose
 - NVIDIA GPU (optional, for GPU acceleration)
 
-### 1. Start infrastructure
+### GPU support (optional)
+
+By default the GPU section in `docker-compose.yaml` is commented out and Ollama runs on CPU.
+If you have an NVIDIA GPU, uncomment the following block inside the `ollama` service:
+
+```yaml
+deploy:
+  resources:
+    reservations:
+      devices:
+        - driver: nvidia
+          count: all
+          capabilities: [gpu]
+```
+
+You also need the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) installed on the host.
+
+### 1. Configure environment
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` if needed (timezone, GPU settings, log level).
+
+### 2. Start infrastructure
 
 ```bash
 docker compose up -d
@@ -188,7 +213,7 @@ Content-Type: application/json
 | Field       | Type   | Required | Description                                                                              |
 | ----------- | ------ | -------- | ---------------------------------------------------------------------------------------- |
 | `question`  | string | yes      | The user's question                                                                      |
-| `type`      | string | yes      | Pipeline type: `chat`, `rag`, `rag-rephrasing`, `garden-assistant`                                 |
+| `type`      | string | yes      | Pipeline type: `chat`, `rag`, `rag-rephrasing`, `garden-assistant`                       |
 | `sessionId` | string | no       | Session ID for conversation history. If omitted, a new session is created automatically. |
 
 **Example — RAG with rephrasing:**
