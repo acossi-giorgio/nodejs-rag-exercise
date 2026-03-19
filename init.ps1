@@ -72,7 +72,7 @@ while (-not $ollamaReady) {
     }
 }
 
-$MODELS = @("qwen2.5:1.5b", "qwen3.5:0.8b", "nomic-embed-text:v1.5", "phi4-mini:3.8b")
+$MODELS = @("nomic-embed-text:v1.5", "phi4-mini:3.8b")
 
 foreach ($MODEL in $MODELS) {
     Write-Host "Pulling model: $MODEL"

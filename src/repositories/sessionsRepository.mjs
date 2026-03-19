@@ -25,7 +25,7 @@ export async function createSession(db) {
         updatedAt: now
     };
     const result = await sessions.insertOne(session);
-    return result.insertedId;
+    return { _id: result.insertedId, ...session };
 }
 
 export async function updateSessionStatus(db, sessionId, status) {

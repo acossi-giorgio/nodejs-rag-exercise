@@ -58,5 +58,15 @@ export const env = {
       minChunkLen: Number(process.env.MIN_CHUNK_LEN),
       maxSpecialRatio: Number(process.env.MAX_SPECIAL_RATIO),
       allowedMimeTypes: process.env.ALLOWED_MIME_TYPES
+  },
+
+  rewriter: {
+      model: process.env.REWRITER_MODEL,
+      temperature: Number(process.env.REWRITER_MODEL_TEMPERATURE),
+      maxTokens: Number(process.env.REWRITER_MODEL_MAX_TOKENS),
+      topP: Number(process.env.REWRITER_MODEL_TOP_P),
+      topK: Number(process.env.REWRITER_MODEL_TOP_K),
+      presencePenalty: Number(process.env.REWRITER_MODEL_PRESENCE_PENALTY),
+      numContext: Number(process.env.REWRITER_MODEL_NUM_CONTEXT),
   }
 };
