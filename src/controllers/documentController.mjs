@@ -7,10 +7,8 @@ import { getDocument } from "../repositories/documentRepository.mjs";
 import { sanitizeDocumentName } from "../common/utils.mjs";
 
 export async function uploadDocumentHandler(req, res) {
-  const logPrefix = "| uploadDocumentHandler |";
-
   try {
-    logger.info(`${logPrefix} Upload document request received`);
+    logger.info(`Upload document request received`);
     let payload = req.file;
     const body = req.body || {};
 
@@ -42,7 +40,7 @@ export async function uploadDocumentHandler(req, res) {
 
     const insertedId = await createDocument(db, ingestionResult.name);
 
-    logger.info(`${logPrefix} Document '${ingestionResult.name}' ingested successfully`);
+    logger.info(`Document '${ingestionResult.name}' ingested successfully`);
     return res.status(201).json({
       id: insertedId?.toString(),
       name: ingestionResult.name,
@@ -54,7 +52,7 @@ export async function uploadDocumentHandler(req, res) {
       },
     });
   } catch (err) {
-    logger.error(`${logPrefix} ${err?.name} ${err?.message}`, { stack: err?.stack });
+    logger.error(`${err?.name} ${err?.message}`, { stack: err?.stack });
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }

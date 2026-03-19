@@ -6,15 +6,13 @@ export async function getInteractions(db, sessionId, limit) {
   return rows.reverse();
 }
 
-export async function createInteraction(db, sessionId, question, rephrasedQuestion, answer, chunks = []) {
+export async function createInteraction(db, sessionId, question, result = {}) {
   const col = db.collection(env.mongo.collections.interactions);
-    const interaction = {
-        sessionId,
-        question,
-        rephrasedQuestion,
-        answer,
-        chunks,
-        createdAt: new Date(),
-    }
-    await col.insertOne(interaction);
+  const interaction = {
+    sessionId,
+    question,
+    ...result,
+    createdAt: new Date(),
+  };
+  await col.insertOne(interaction);
 }

@@ -5,6 +5,7 @@ export const constant = {
     },
     documentMetadata: {
         source: "source",
-        page: "page"
+        page: "page",
+        chunkId: "chunkId"
     }
 };

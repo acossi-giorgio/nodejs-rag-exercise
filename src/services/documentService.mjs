@@ -1,6 +1,7 @@
 import path from "node:path";
 import os from "node:os";
 import fs from "node:fs/promises";
+import { v4 as uuid } from "uuid";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { Document } from "@langchain/core/documents";
@@ -78,10 +79,9 @@ export async function ingestDocument(name, buffer, mimeType, options = {}) {
     return new Document({
       pageContent: doc.pageContent,
       metadata: {
-        [constant.documentMetadata.source]:
-          doc.metadata?.[constant.documentMetadata.source] ?? name,
-        [constant.documentMetadata.page]:
-          doc.metadata?.[constant.documentMetadata.page] ?? 0,
+        [constant.documentMetadata.source]: doc.metadata?.[constant.documentMetadata.source] ?? name,
+        [constant.documentMetadata.page]: doc.metadata?.[constant.documentMetadata.page] ?? 0,
+        [constant.documentMetadata.chunkId]: uuid(),
       },
     });
   });
@@ -94,7 +94,7 @@ export async function ingestDocument(name, buffer, mimeType, options = {}) {
   for (let i = 0; i < finalDocs.length; i += env.ingestion.qdrantBatch) {
     const slice = finalDocs.slice(i, i + env.ingestion.qdrantBatch);
     await vectorStore.addDocuments(slice);
-    logger.info(`| uploadDocument | Ingested ${Math.min(i + env.ingestion.qdrantBatch, finalDocs.length)} / ${finalDocs.length} chunks to Qdrant`);
+    logger.info(`Ingested ${Math.min(i + env.ingestion.qdrantBatch, finalDocs.length)} / ${finalDocs.length} chunks to Qdrant`);
   }
 
   return {
@@ -104,18 +104,4 @@ export async function ingestDocument(name, buffer, mimeType, options = {}) {
     filteredChunks: filteredChunks.length,
     ingestedChunks: finalDocs.length,
   };
-}
-
-export function formatDocs(scored) {
-  if (!scored?.length) return "N/A";
-  return scored
-    .map(([doc, score], i) => {
-        const meta = doc.metadata || {};
-        const source = meta.source ? `Source: ${meta.source}` : null;
-        const page = meta.page ? `Page: ${meta.page}` : null;
-        const metaStr = [source, page].filter(Boolean).join(" | ");
-        
-        return `[Document ${i + 1}] (Relevance: ${score.toFixed(2)})\n${metaStr ? `Metadata: ${metaStr}\n` : ""}Content:\n${doc.pageContent?.trim()}`;
-    })
-    .join("\n");
 }

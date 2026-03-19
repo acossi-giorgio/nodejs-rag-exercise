@@ -1,4 +1,5 @@
 import path from "path";
+import { logger } from "../config/logger.mjs";
 
 export function cleanRawResponse(raw) {
   if (raw == null) return "";
@@ -6,7 +7,12 @@ export function cleanRawResponse(raw) {
   if (typeof text !== "string") text = String(text ?? "");
 
   text = text.replace(/<think>[\s\S]*?<\/think>/gi, "");
-  text = text.replace(/[\s\S]*?<\/think>/gi, "");
+  
+  if (/^[\s\S]*?<\/think>/i.test(text)) {
+      text = text.replace(/^[\s\S]*?<\/think>/i, "");
+  } else {
+      text = text.replace(/<\/think>/gi, "");
+  }
   text = text.replace(/<think>/gi, "");
   text = text.trim();
   
@@ -31,4 +37,13 @@ export function decodeBase64(content) {
 export function sanitizeDocumentName(name) {
   const baseName = path.basename(name).replace(/\s+/g, "_").replace(/[^a-zA-Z0-9._-]/g, "_");
   return baseName.toLowerCase().endsWith(".pdf") ? baseName : `${baseName}.pdf`;
+}
+
+export async function logPrompt(prompt, input, history) {
+  if (history?.length) {
+    const hist = history.map((m) => `[${m.getType()}]: ${m.content}`).join("\n");
+    logger.debug(`History:\n${hist}`);
+  }
+  const msgs = (await prompt.formatMessages(input)).map((m) => `[${m.getType()}]: ${m.content}`).join("\n");
+  logger.debug(`Prompt:\n${msgs}`);
 }

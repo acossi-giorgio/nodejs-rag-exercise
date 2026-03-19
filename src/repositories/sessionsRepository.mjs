@@ -14,7 +14,7 @@ export async function getSession(db, sessionId) {
     const _id = toObjectId(sessionId);
     if (!_id) return null;
     const sess = await sessions.findOne({ _id });
-    return sess || null;
+    return sess;
 }
 
 export async function createSession(db) {

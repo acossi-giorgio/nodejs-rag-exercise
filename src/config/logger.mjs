@@ -1,6 +1,6 @@
 import winston from 'winston';
 
-const level = process.env.LOG_LEVEL || 'info';
+const level = process.env.LOG_LEVEL;
 
 const logger = winston.createLogger({
   level,
@@ -11,7 +11,7 @@ const logger = winston.createLogger({
     winston.format.splat(),
     winston.format.printf(info => {
       const { timestamp, level, message, stack, ...meta } = info;
-      const base = `${timestamp} [${level}] ${message}`;
+      const base = `${timestamp} ${level} ${message}`;
       const metaKeys = Object.keys(meta);
       const metaStr = metaKeys.length ? ` ${JSON.stringify(meta)}` : '';
       return stack ? `${base}\n${stack}${metaStr}` : `${base}${metaStr}`;

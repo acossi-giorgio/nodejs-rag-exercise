@@ -5,10 +5,11 @@ const ajv = new Ajv({ allErrors: true, removeAdditional: "failing" });
 const interactionRequestValidator = ajv.compile({
     type: "object",
     additionalProperties: false,
-    required: ["sessionId", "question"],
+    required: ["question", "type"],
     properties: {
         sessionId: { type: "string" },
-        question: { type: "string" }
+        question: { type: "string" },
+        type: { type: "string" }
     }
 });
 

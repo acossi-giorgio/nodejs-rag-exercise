@@ -3,7 +3,6 @@ loadEnv();
 
 export const env = {
   port: Number(process.env.PORT),
-  apiKey: process.env.API_KEY,
 
   mongo: {
     uri: process.env.MONGODB_URI,
@@ -12,15 +11,9 @@ export const env = {
         sessions: process.env.MONGODB_SESSIONS_COLLECTION,
         interactions: process.env.MONGODB_INTERACTIONS_COLLECTION,
         documents: process.env.MONGODB_DOCUMENTS_COLLECTION,
+        mqttTemperature: process.env.MONGODB_MQTT_TEMPERATURE_COLLECTION,
+        mqttHumidity: process.env.MONGODB_MQTT_HUMIDITY_COLLECTION,
     }
-  },
-
-  influx: {
-    url: process.env.INFLUX_URL,
-    token: process.env.INFLUX_TOKEN,
-    org: process.env.INFLUX_ORG,
-    bucket: process.env.INFLUX_BUCKET,
-    precision: process.env.INFLUX_PRECISION
   },
 
   qdrant: {
@@ -36,15 +29,20 @@ export const env = {
   chat: {
     model: process.env.CHAT_MODEL,
     temperature: Number(process.env.CHAT_MODEL_TEMPERATURE),
-  },
-
-  rewriter: {
-    model: process.env.REWRITER_MODEL,
-    temperature: Number(process.env.REWRITER_MODEL_TEMPERATURE),
+    maxTokens: Number(process.env.CHAT_MODEL_MAX_TOKENS),
+    topP: Number(process.env.CHAT_MODEL_TOP_P),
+    topK: Number(process.env.CHAT_MODEL_TOP_K),
+    presencePenalty: Number(process.env.CHAT_MODEL_PRESENCE_PENALTY),
+    numContext: Number(process.env.CHAT_MODEL_NUM_CONTEXT),
   },
 
   embeddings: {
     model: process.env.EMBEDDINGS_MODEL
+  },
+
+  mqtt: {
+    url: process.env.MQTT_URL,
+    clientId: process.env.MQTT_CLIENT_ID,
   },
 
   rag: {

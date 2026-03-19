@@ -60,6 +60,19 @@ services:
               count: all
               capabilities: [gpu]
 
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: nodejs-rag-mosquitto
+    networks:
+      - nodejs-rag-network
+    ports:
+      - "1883:1883"
+    volumes:
+      - mosquitto-data:/mosquitto/data
+      - mosquitto-log:/mosquitto/log
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+    restart: unless-stopped
+
   backend:
     build:
       context: .
@@ -79,6 +92,8 @@ services:
         condition: service_started
       ollama:
         condition: service_started
+      mosquitto:
+        condition: service_started
     networks:
       - nodejs-rag-network
     restart: unless-stopped
@@ -92,3 +107,5 @@ volumes:
   mongo-db-data:
   qdrant-data:
   ollama-data:
+  mosquitto-data:
+  mosquitto-log:
