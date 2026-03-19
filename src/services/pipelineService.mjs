@@ -8,7 +8,7 @@ export function getPipeline(type) {
         "rag": runRagPipeline,
         "rag-rephrasing": runRagWithRephrasingPipeline,
         "chat": runChatPipeline,
-        "garden": runGardenPipeline,
+        "garden-assistant": runGardenPipeline,
     };
     return pipelineRegistry[type];
 }
