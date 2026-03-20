@@ -25,10 +25,10 @@ Client
   │
   ▼
 Express API (port 3000)
-  ├── POST   /session           → create conversation session
-  ├── POST   /document          → upload & ingest documents into Qdrant
-  ├── DELETE /document/:name    → delete document from MongoDB and Qdrant
-  └── POST   /interaction       → ask a question (selects pipeline by type)
+  ├── POST   /session        → create conversation session
+  ├── POST   /document       → upload & ingest documents into Qdrant
+  ├── DELETE /document/:name → delete document from MongoDB and Qdrant
+  └── POST   /interaction    → ask a question (selects pipeline by type)
         ├── chat             → plain LLM conversation
         ├── rag              → semantic retrieval from documents
         ├── rag-rephrasing   → rag + automatic query rewriting
@@ -99,8 +99,6 @@ deploy:
           count: all
           capabilities: [gpu]
 ```
-
-You also need the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) installed on the host.
 
 ### 1. Configure environment
 
