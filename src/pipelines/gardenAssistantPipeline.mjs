@@ -5,7 +5,7 @@ import { getMongoDb } from "../config/database.mjs";
 import { env } from "../config/env.mjs";
 import { getLatestReading } from "../repositories/mqttEventRepository.mjs";
 import { cleanRawResponse, logPrompt } from "../common/utils.mjs";
-import { buildGardenPrompt } from "../prompts/gardenPrompt.mjs";
+import { buildGardenAssistantPrompt } from "../prompts/gardenAssistantPrompt.mjs";
 import { logger } from "../config/logger.mjs";
 
 const llm = await getChatModel();
@@ -17,8 +17,8 @@ function formatReading(doc) {
     return unit ? `${value}${unit} ${at}` : `${value}${at}`;
 }
 
-export async function runGardenPipeline(question, _sources = [], interactions = []) {
-    logger.info("Garden pipeline start");
+export async function runGardenAssistantPipeline(question, _sources = [], interactions = []) {
+    logger.info("Garden assistant pipeline start");
 
     logger.info("Building interaction history");
     const history = interactions.flatMap((i) => [
@@ -37,7 +37,7 @@ export async function runGardenPipeline(question, _sources = [], interactions = 
     logger.debug("Sensor readings", { temperature, humidity });
 
     logger.info("Generating garden advice");
-    const prompt = buildGardenPrompt();
+    const prompt = buildGardenAssistantPrompt();
     const input = { question, temperature, humidity, history };
     await logPrompt(prompt, input, history);
     const rawAnswer = await prompt.pipe(llm).pipe(new StringOutputParser()).invoke(input);

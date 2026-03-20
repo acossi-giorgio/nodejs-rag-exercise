@@ -1,4 +1,4 @@
-import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
 
 const SYSTEM_PROMPT_TEMPLATE = `You are a search query optimizer for a Qdrant semantic vector database.
 Your ONLY job is to extract the core 'Entity' and the user's 'Intent' into a minimal, highly concentrated search string.
@@ -28,7 +28,6 @@ const HUMAN_TEMPLATE = `{question}`;
 export function buildRewriterPrompt() {
   return ChatPromptTemplate.fromMessages([
     ["system", SYSTEM_PROMPT_TEMPLATE],
-    new MessagesPlaceholder("history"),
     ["human", HUMAN_TEMPLATE],
   ]);
 }

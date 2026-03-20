@@ -42,7 +42,10 @@ export async function runRagWithRephrasingPipeline(question, sources = [], inter
     const prompt = buildRagPrompt();
     const input = { question, context: formatChunks(chunks), history };
     await logPrompt(prompt, input, history);
-    const rawAnswer = await prompt.pipe(llm).pipe(new StringOutputParser()).invoke(input);
+    const rawAnswer = await prompt
+        .pipe(llm)
+        .pipe(new StringOutputParser())
+        .invoke(input);
     logger.debug("Response", { rawAnswer });
 
     logger.info("RAG with rephrasing pipeline completed successfully");
