@@ -8,6 +8,7 @@
     "start": "node src/server.mjs"
   },
   "dependencies": {
+    "@dqbd/tiktoken": "^1.0.21",
     "@influxdata/influxdb-client": "^1.35.0",
     "@langchain/community": "^0.3.7",
     "@langchain/core": "^0.3.10",
@@ -19,6 +20,7 @@
     "chromadb": "^1.9.3",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "fastembed": "^1.14.1",
     "fast-glob": "^3.3.3",
     "mongodb": "^6.8.0",
     "mqtt": "^5.15.0",

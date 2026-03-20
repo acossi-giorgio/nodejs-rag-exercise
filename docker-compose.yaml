@@ -52,14 +52,13 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
-    # Uncomment the section below if you have an NVIDIA GPU
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: all
-    #           capabilities: [gpu]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
 
   mosquitto:
     image: eclipse-mosquitto:latest

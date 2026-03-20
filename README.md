@@ -10,7 +10,7 @@ A Node.js backend that combines **RAG (Retrieval-Augmented Generation)**, **conv
 | ------------- | ----------------------- |
 | Runtime       | Node.js                 |
 | LLM inference | Ollama (phi4-mini:3.8b) |
-| Embeddings    | nomic-embed-text:v1.5   |
+| Embeddings    | mxbai-embed-large       |
 | Vector store  | Qdrant                  |
 | Database      | MongoDB                 |
 | MQTT broker   | Eclipse Mosquitto       |
@@ -145,7 +145,7 @@ The script:
 
 - Waits for MongoDB and Ollama to be ready
 - Creates collections (`sessions`, `interactions`, `documents`, `humidityEvents`, `temperatureEvents`) and indexes
-- Pulls `nomic-embed-text:v1.5`, `phi4-mini:3.8b`, `phi4-mini-reasoning:3.8b`
+- Pulls `mxbai-embed-large`, `phi4-mini:3.8b`
 
 ### 3. Verify
 

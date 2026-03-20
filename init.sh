@@ -54,7 +54,7 @@ until docker exec nodejs-rag-ollama ollama list > /dev/null 2>&1; do
 done
 echo "Ollama is ready"
 
-MODELS=("nomic-embed-text:v1.5" "phi4-mini:3.8b")
+MODELS=("mxbai-embed-large" "phi4-mini:3.8b")
 
 for MODEL in "${MODELS[@]}"; do
     echo "Pulling model: $MODEL"

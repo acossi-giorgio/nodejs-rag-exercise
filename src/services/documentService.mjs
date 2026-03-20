@@ -5,11 +5,16 @@ import { v4 as uuid } from "uuid";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { Document } from "@langchain/core/documents";
+import { get_encoding } from "@dqbd/tiktoken";
 import { getEmbeddings } from "../config/embeddings.mjs";
-import { getQdrantVectorStore, getQdrantClient } from "../config/database.mjs";
+import { getQdrantClient, getQdrantVectorStore } from "../config/database.mjs";
 import { constant } from "../config/constat.mjs";
 import { logger } from "../config/logger.mjs";
 import { env } from "../config/env.mjs";
+
+
+const textEncoding = get_encoding("cl100k_base");
+const splitSeparators = ["\n# ", "\n## ", "\n### ", "\n\n", "\n", ". ", " ", ""];
 
 
 function isValidChunk(content, minChunkLen, maxSpecialRatio) {
@@ -89,18 +94,22 @@ export async function ingestDocument(name, buffer, mimeType, options = {}) {
   const splitter = new RecursiveCharacterTextSplitter({
     chunkSize,
     chunkOverlap,
+    separators: splitSeparators,
+    lengthFunction: (text) => textEncoding.encode(text).length,
   });
 
   const chunks = await splitter.splitDocuments(rawDocs);
   const filteredChunks = chunks.filter((chunk) => isValidChunk(chunk.pageContent, minChunkLen, maxSpecialRatio));
 
-  const finalDocs = filteredChunks.map((doc) => {
+  const finalDocs = filteredChunks.map((doc, chunkIndex) => {
     return new Document({
       pageContent: doc.pageContent,
       metadata: {
+        ...doc.metadata,
         [constant.documentMetadata.source]: doc.metadata?.[constant.documentMetadata.source] ?? name,
         [constant.documentMetadata.page]: doc.metadata?.[constant.documentMetadata.page] ?? 0,
         [constant.documentMetadata.chunkId]: uuid(),
+        chunkIndex,
       },
     });
   });
@@ -110,9 +119,13 @@ export async function ingestDocument(name, buffer, mimeType, options = {}) {
   const embeddings = await getEmbeddings();
   const vectorStore = await getQdrantVectorStore(embeddings);
 
+  logger.info("Ingesting chunks into vector store...");
+
   for (let i = 0; i < finalDocs.length; i += env.ingestion.qdrantBatch) {
     const slice = finalDocs.slice(i, i + env.ingestion.qdrantBatch);
-    await vectorStore.addDocuments(slice);
+    await vectorStore.addDocuments(slice, {
+      ids: slice.map((d) => d.metadata[constant.documentMetadata.chunkId]),
+    });
     logger.info(`Ingested ${Math.min(i + env.ingestion.qdrantBatch, finalDocs.length)} / ${finalDocs.length} chunks to Qdrant`);
   }
 
@@ -127,6 +140,8 @@ export async function ingestDocument(name, buffer, mimeType, options = {}) {
 
 export async function deleteDocumentVectors(name) {
   const client = getQdrantClient();
+  logger.info(`Deleting vectors for document: ${name}`);
+  
   await client.delete(env.qdrant.collection, {
     wait: true,
     filter: {
@@ -136,4 +151,6 @@ export async function deleteDocumentVectors(name) {
       }],
     },
   });
+  
+  logger.info(`Deleted vectors for document: ${name}`);
 }
