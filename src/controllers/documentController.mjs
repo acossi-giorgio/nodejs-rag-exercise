@@ -31,13 +31,13 @@ export async function uploadDocumentHandler(req, res) {
     Object.keys(options).forEach(key => options[key] === undefined && delete options[key]);
 
     const ingestionResult = await ingestDocument(
-      payload.originalname,
+      sanitizedName,
       payload.buffer,
       payload.mimetype,
       options
     );
 
-    const insertedId = await createDocument(db, ingestionResult.name);
+    const insertedId = await createDocument(db, sanitizedName);
 
     logger.info(`Document '${ingestionResult.name}' ingested successfully`);
     return res.status(201).json({
@@ -58,18 +58,19 @@ export async function uploadDocumentHandler(req, res) {
 
 export async function deleteDocumentHandler(req, res) {
   try {
-    const name = req.params.name;
+    let name = req.params.name;
     if (!name) return res.status(400).json({ error: "Document name is required" });
 
+    const sanitizedName = sanitizeDocumentName(name);
     const db = await getMongoDb();
-    const existingDoc = await getDocument(db, name);
+    const existingDoc = await getDocument(db, sanitizedName);
     if (!existingDoc) return res.status(404).json({ error: "Document not found" });
 
-    await deleteDocumentVectors(name);
-    await deleteDocument(db, name);
+    await deleteDocumentVectors(sanitizedName);
+    await deleteDocument(db, sanitizedName);
 
-    logger.info(`Document '${name}' deleted successfully`);
-    return res.status(200).json({ message: "Document deleted successfully", name });
+    logger.info(`Document '${sanitizedName}' deleted successfully`);
+    return res.status(200).json({ message: "Document deleted successfully", name: sanitizedName });
   } catch (err) {
     logger.error(`${err?.name} ${err?.message}`, { stack: err?.stack });
     return res.status(500).json({ error: "Internal Server Error" });

@@ -131,7 +131,7 @@ export async function deleteDocumentVectors(name) {
     wait: true,
     filter: {
       must: [{
-        key: constant.documentMetadata.source,
+        key: `metadata.${constant.documentMetadata.source}`,
         match: { value: name },
       }],
     },
