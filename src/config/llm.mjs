@@ -24,5 +24,6 @@ export async function getRewriterModel() {
     topK: env.rewriter.topK,
     presencePenalty: env.rewriter.presencePenalty,
     numCtx: env.rewriter.numContext,
+    stop: ["\n", "<|end|>", "<|endoftext|>"],
   });
 }

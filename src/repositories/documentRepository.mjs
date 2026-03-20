@@ -15,3 +15,9 @@ export async function getDocument(db, documentName){
   const documents = db.collection(env.mongo.collections.documents);
   return await documents.findOne({ name: documentName });
 }
+
+export async function deleteDocument(db, documentName) {
+  const documents = db.collection(env.mongo.collections.documents);
+  const result = await documents.deleteOne({ name: documentName });
+  return result.deletedCount;
+}

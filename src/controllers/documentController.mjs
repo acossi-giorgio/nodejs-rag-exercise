@@ -1,9 +1,8 @@
 import { logger } from "../config/logger.mjs";
 import { getMongoDb } from "../config/database.mjs";
-import { createDocument } from "../repositories/documentRepository.mjs";
+import { createDocument, getDocument, deleteDocument } from "../repositories/documentRepository.mjs";
 import { validateUploadDocument } from "../schemas/documentSchema.mjs";
-import { ingestDocument } from "../services/documentService.mjs";
-import { getDocument } from "../repositories/documentRepository.mjs";
+import { ingestDocument, deleteDocumentVectors } from "../services/documentService.mjs";
 import { sanitizeDocumentName } from "../common/utils.mjs";
 
 export async function uploadDocumentHandler(req, res) {
@@ -51,6 +50,26 @@ export async function uploadDocumentHandler(req, res) {
         ingestedChunks: ingestionResult.ingestedChunks,
       },
     });
+  } catch (err) {
+    logger.error(`${err?.name} ${err?.message}`, { stack: err?.stack });
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+export async function deleteDocumentHandler(req, res) {
+  try {
+    const name = req.params.name;
+    if (!name) return res.status(400).json({ error: "Document name is required" });
+
+    const db = await getMongoDb();
+    const existingDoc = await getDocument(db, name);
+    if (!existingDoc) return res.status(404).json({ error: "Document not found" });
+
+    await deleteDocumentVectors(name);
+    await deleteDocument(db, name);
+
+    logger.info(`Document '${name}' deleted successfully`);
+    return res.status(200).json({ message: "Document deleted successfully", name });
   } catch (err) {
     logger.error(`${err?.name} ${err?.message}`, { stack: err?.stack });
     return res.status(500).json({ error: "Internal Server Error" });

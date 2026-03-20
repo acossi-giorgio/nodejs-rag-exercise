@@ -35,8 +35,7 @@ export function decodeBase64(content) {
 }
 
 export function sanitizeDocumentName(name) {
-  const baseName = path.basename(name).replace(/\s+/g, "_").replace(/[^a-zA-Z0-9._-]/g, "_");
-  return baseName.toLowerCase().endsWith(".pdf") ? baseName : `${baseName}.pdf`;
+  return path.basename(name).replace(/\s+/g, "_").replace(/[^a-zA-Z0-9._-]/g, "_");
 }
 
 export async function logPrompt(prompt, input, history) {

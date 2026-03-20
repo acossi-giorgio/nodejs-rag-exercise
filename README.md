@@ -25,9 +25,10 @@ Client
   │
   ▼
 Express API (port 3000)
-  ├── POST /session          → create conversation session
-  ├── POST /document         → upload & ingest documents into Qdrant
-  └── POST /interaction      → ask a question (selects pipeline by type)
+  ├── POST   /session           → create conversation session
+  ├── POST   /document          → upload & ingest documents into Qdrant
+  ├── DELETE /document/:name    → delete document from MongoDB and Qdrant
+  └── POST   /interaction       → ask a question (selects pipeline by type)
         ├── chat             → plain LLM conversation
         ├── rag              → semantic retrieval from documents
         ├── rag-rephrasing   → rag + automatic query rewriting
@@ -190,11 +191,11 @@ POST /document
 Content-Type: multipart/form-data
 ```
 
-| Field          | Type   | Required | Description                    |
-| -------------- | ------ | -------- | ------------------------------ |
-| `file`         | File   | yes      | PDF or text file to ingest     |
-| `chunkSize`    | number | no       | Override default chunk size    |
-| `chunkOverlap` | number | no       | Override default chunk overlap |
+| Field          | Type   | Required | Description                                                         |
+| -------------- | ------ | -------- | ------------------------------------------------------------------- |
+| `file`         | File   | yes      | PDF (`application/pdf`) or plain text (`text/plain`) file to ingest |
+| `chunkSize`    | number | no       | Override default chunk size                                         |
+| `chunkOverlap` | number | no       | Override default chunk overlap                                      |
 
 **Response `201`:**
 
@@ -210,6 +211,28 @@ Content-Type: multipart/form-data
   }
 }
 ```
+
+---
+
+### Delete document
+
+```
+DELETE /document/:name
+```
+
+| Param  | Type   | Required | Description                                 |
+| ------ | ------ | -------- | ------------------------------------------- |
+| `name` | string | yes      | Exact document name (as returned by upload) |
+
+Deletes the document record from MongoDB **and** all associated vector chunks from Qdrant.
+
+**Response `200`:**
+
+```json
+{ "message": "Document deleted successfully", "name": "document.pdf" }
+```
+
+**Response `404`** if the document does not exist.
 
 ---
 

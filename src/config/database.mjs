@@ -13,6 +13,14 @@ export async function getMongoDb() {
   return mongoInstance.db(env.mongo.db);
 }
 
+let qdrantClientInstance = null;
+export function getQdrantClient() {
+  if (!qdrantClientInstance) {
+    qdrantClientInstance = new QdrantClient({ url: env.qdrant.url });
+  }
+  return qdrantClientInstance;
+}
+
 let qdrantInstance = null;
 export function getQdrantVectorStore(embeddings) {
   if (qdrantInstance) return qdrantInstance;
