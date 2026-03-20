@@ -275,7 +275,7 @@ Content-Type: application/json
 {
   "sessionId": "67eb1a2f3c4d5e6f7a8b9c0d",
   "question": "what are the current temperature and humidity values?",
-  "type": "garden"
+  "type": "garden-assistant"
 }
 ```
 
